@@ -299,126 +299,208 @@ Estos métodos te permiten realizar una amplia variedad de operaciones en tu bas
 - **503 Service Unavailable**: El servidor no está disponible temporalmente (por ejemplo, por sobrecarga o mantenimiento).
 
 
+Claro, aquí tienes un ejemplo de cómo definir modelos en Sequelize con `sequelize-typescript` que incluyen relaciones de uno a uno, uno a muchos, y muchos a muchos. Este ejemplo se basa en el código que proporcionaste.
 
-### Ejemplo de Definición de Modelos en Sequelize con Dependencias Circulares
+### Ejemplo de Definición de Modelos en Sequelize con `sequelize-typescript`
 
 #### 1. Configuración de Sequelize
 
-```javascript
-// config/database.js
-const { Sequelize } = require('sequelize');
+```typescript
+// src/config/database.ts
+import { Sequelize } from 'sequelize-typescript';
+import { Patients } from '../models/Patients';
+import { Medications } from '../models/Medications';
+import { Tags } from '../models/Tags';
+import { PostTags } from '../models/PostTags';
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
+const sequelize = new Sequelize({
   dialect: 'mysql', // O el dialecto que estés usando
+  host: 'localhost',
+  username: 'root',
+  password: 'password',
+  database: 'database',
+  models: [Patients, Medications, Tags, PostTags],
 });
 
-module.exports = sequelize;
+export default sequelize;
 ```
 
 #### 2. Definición de Modelos
 
-```javascript
-// models/User.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Profile = require('./Profile');
-const Post = require('./Post');
+```typescript
+// src/models/Patients.ts
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  HasMany,
+} from 'sequelize-typescript';
+import { Medications } from './Medications';
 
-// Definir el modelo User
-const User = sequelize.define('User', {
-  name: {
-    type: DataTypes.STRING,
+@Table({
+  tableName: 'patients',
+  timestamps: true,
+})
+export class Patients extends Model {
+  @AutoIncrement
+  @PrimaryKey
+  @Column({
+    type: DataType.INTEGER,
+  })
+  id!: number;
+
+  @Column({
+    type: DataType.STRING,
     allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
+  })
+  name!: string;
+
+  @HasMany(() => Medications)
+  medications!: Medications[];
+}
+```
+
+```typescript
+// src/models/Medications.ts
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
+import { Patients } from './Patients';
+
+@Table({
+  tableName: 'medications',
+  timestamps: true,
+})
+export class Medications extends Model {
+  @AutoIncrement
+  @PrimaryKey
+  @Column({
+    type: DataType.INTEGER,
+  })
+  id!: number;
+
+  @Column({
+    type: DataType.STRING,
     allowNull: false,
     unique: true,
-  },
-});
+  })
+  medicationName!: string;
 
-// Relación uno a uno con Profile
-User.hasOne(Profile, { foreignKey: 'userId' });
-Profile.belongsTo(User, { foreignKey: 'userId' });
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  quantity!: number;
 
-// Relación uno a muchos con Post
-User.hasMany(Post, { foreignKey: 'userId' });
-Post.belongsTo(User, { foreignKey: 'userId' });
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  expirationDate!: Date;
 
-module.exports = User;
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  price!: number;
+
+  @ForeignKey(() => Patients)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  patientId!: number;
+
+  @BelongsTo(() => Patients)
+  patient!: Patients;
+}
 ```
 
-```javascript
-// models/Profile.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+```typescript
+// src/models/Tags.ts
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { Medications } from './Medications';
+import { PostTags } from './PostTags';
 
-// Definir el modelo Profile
-const Profile = sequelize.define('Profile', {
-  bio: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  website: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-});
+@Table({
+  tableName: 'tags',
+  timestamps: true,
+})
+export class Tags extends Model {
+  @AutoIncrement
+  @PrimaryKey
+  @Column({
+    type: DataType.INTEGER,
+  })
+  id!: number;
 
-module.exports = Profile;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name!: string;
+
+  @BelongsToMany(() => Medications, () => PostTags)
+  medications!: Medications[];
+}
 ```
 
-```javascript
-// models/Post.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Tag = require('./Tag');
+```typescript
+// src/models/PostTags.ts
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+} from 'sequelize-typescript';
+import { Medications } from './Medications';
+import { Tags } from './Tags';
 
-// Definir el modelo Post
-const Post = sequelize.define('Post', {
-  title: {
-    type: DataTypes.STRING,
+@Table({
+  tableName: 'post_tags',
+  timestamps: false,
+})
+export class PostTags extends Model {
+  @ForeignKey(() => Medications)
+  @Column({
+    type: DataType.INTEGER,
     allowNull: false,
-  },
-  content: {
-    type: DataTypes.TEXT,
+  })
+  medicationId!: number;
+
+  @ForeignKey(() => Tags)
+  @Column({
+    type: DataType.INTEGER,
     allowNull: false,
-  },
-});
-
-// Relación muchos a muchos con Tag
-Post.belongsToMany(Tag, { through: 'PostTags' });
-Tag.belongsToMany(Post, { through: 'PostTags' });
-
-module.exports = Post;
-```
-
-```javascript
-// models/Tag.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-
-// Definir el modelo Tag
-const Tag = sequelize.define('Tag', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-module.exports = Tag;
+  })
+  tagId!: number;
+}
 ```
 
 #### 3. Sincronización de la Base de Datos
 
-```javascript
-// sync.js
-const sequelize = require('./config/database');
-const User = require('./models/User');
-const Profile = require('./models/Profile');
-const Post = require('./models/Post');
-const Tag = require('./models/Tag');
+```typescript
+// src/sync.ts
+import sequelize from './config/database';
 
 const syncDatabase = async () => {
   try {
@@ -434,10 +516,8 @@ syncDatabase();
 
 ### Explicación de Relaciones
 
-- **User y Profile**: Relación uno a uno. Cada usuario tiene un perfil asociado.
-- **User y Post**: Relación uno a muchos. Cada usuario puede tener múltiples publicaciones.
-- **Post y Tag**: Relación muchos a muchos. Cada publicación puede tener múltiples etiquetas y cada etiqueta puede estar asociada a múltiples publicaciones.
+- **Patients y Medications**: Relación uno a muchos. Un paciente puede tener múltiples medicamentos.
+- **Medications y Tags**: Relación muchos a muchos. Un medicamento puede tener múltiples etiquetas y una etiqueta puede estar asociada a múltiples medicamentos. La relación se maneja a través de la tabla de unión `PostTags`.
 
-Este ejemplo debería darte una buena base para trabajar con dependencias circulares y relaciones en Sequelize. ¡Si necesitas más detalles o tienes alguna pregunta, avísame!
 
 
