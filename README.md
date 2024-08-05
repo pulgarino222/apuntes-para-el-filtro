@@ -1,3 +1,60 @@
+
+
+### Códigos de Estado de Respuesta HTTP
+
+#### 1xx - Información
+- **100 Continue**: El servidor ha recibido la solicitud y el cliente puede continuar con la solicitud.
+- **101 Switching Protocols**: El servidor acepta cambiar el protocolo según la solicitud del cliente.
+
+#### 2xx - Éxito
+- **200 OK**: La solicitud ha tenido éxito.
+- **201 Created**: La solicitud ha sido cumplida y se ha creado un nuevo recurso.
+- **202 Accepted**: La solicitud ha sido aceptada para procesamiento, pero no ha sido completada.
+- **203 Non-Authoritative Information**: La solicitud ha tenido éxito, pero la información devuelta puede no ser la del servidor original.
+- **204 No Content**: La solicitud ha tenido éxito, pero no hay contenido que devolver.
+- **205 Reset Content**: La solicitud ha tenido éxito, y el cliente debe reiniciar la vista del documento.
+- **206 Partial Content**: El servidor está enviando solo una parte del recurso solicitado.
+
+#### 3xx - Redirección
+- **300 Multiple Choices**: Hay varias opciones para el recurso solicitado.
+- **301 Moved Permanently**: El recurso solicitado ha sido movido permanentemente a una nueva URL.
+- **302 Found**: El recurso solicitado ha sido encontrado en una URL diferente, pero se debería usar la URL original para futuras solicitudes.
+- **303 See Other**: La respuesta a la solicitud puede encontrarse en otra URL.
+- **304 Not Modified**: El recurso no ha sido modificado desde la última solicitud.
+- **305 Use Proxy**: El recurso debe ser accedido a través de un proxy especificado.
+- **307 Temporary Redirect**: El recurso solicitado se encuentra temporalmente en una URL diferente.
+- **308 Permanent Redirect**: El recurso solicitado ha sido movido permanentemente a una URL diferente.
+
+#### 4xx - Error del Cliente
+- **400 Bad Request**: La solicitud no puede ser procesada debido a un error del cliente (por ejemplo, sintaxis incorrecta).
+- **401 Unauthorized**: La solicitud requiere autenticación del usuario.
+- **402 Payment Required**: Código reservado para futuras necesidades (por ejemplo, pagos).
+- **403 Forbidden**: El servidor ha comprendido la solicitud, pero se niega a autorizarla.
+- **404 Not Found**: El recurso solicitado no se encuentra en el servidor.
+- **405 Method Not Allowed**: El método de solicitud no está permitido para el recurso solicitado.
+- **406 Not Acceptable**: El recurso solicitado no es aceptable según los encabezados de la solicitud.
+- **407 Proxy Authentication Required**: Se requiere autenticación con el proxy.
+- **408 Request Timeout**: El servidor ha agotado el tiempo de espera para la solicitud del cliente.
+- **409 Conflict**: La solicitud no pudo ser completada debido a un conflicto con el estado actual del recurso.
+- **410 Gone**: El recurso solicitado ha sido eliminado permanentemente.
+- **411 Length Required**: Se requiere el encabezado `Content-Length` en la solicitud.
+- **412 Precondition Failed**: Una o más condiciones dadas en los encabezados de la solicitud han fallado.
+- **413 Payload Too Large**: La solicitud es demasiado grande para que el servidor la procese.
+- **414 URI Too Long**: La URI proporcionada es demasiado larga para que el servidor la procese.
+- **415 Unsupported Media Type**: El tipo de medio de la solicitud no es soportado por el servidor.
+- **416 Range Not Satisfiable**: El rango solicitado no puede ser satisfecho.
+- **417 Expectation Failed**: La expectativa dada en el encabezado de la solicitud no puede ser cumplida por el servidor.
+
+#### 5xx - Error del Servidor
+- **500 Internal Server Error**: El servidor encontró una condición inesperada que impidió la solicitud.
+- **501 Not Implemented**: El servidor no reconoce el método de solicitud o no lo puede implementar.
+- **502 Bad Gateway**: El servidor actuó como una puerta de enlace o proxy y recibió una respuesta inválida del servidor de origen.
+- **503 Service Unavailable**: El servidor no está disponible temporalmente (por ejemplo, sobrecargado o en mantenimiento).
+- **504 Gateway Timeout**: El servidor actuó como una puerta de enlace o proxy y no recibió una respuesta a tiempo del servidor de origen.
+- **505 HTTP Version Not Supported**: El servidor no soporta la versión del protocolo HTTP utilizada en
+
+
+
 # Operadores de Sequelize
 
 `Op` es un objeto en Sequelize que contiene varios operadores de comparación que puedes usar en tus consultas. Aquí hay una lista de algunos operadores comunes y sus usos:
